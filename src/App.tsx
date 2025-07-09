@@ -1,81 +1,93 @@
 import React, { useState } from 'react';
+import LoginPage from './components/LoginPage';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import KnowledgeBase from './components/KnowledgeBase';
 import Statistics from './components/Statistics';
+import Calendar from './components/Calendar';
+import Achievements from './components/Achievements';
+import Goals from './components/Goals';
+import Community from './components/Community';
+import Settings from './components/Settings';
 import UserProfile from './components/UserProfile';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [darkMode, setDarkMode] = useState(true);
+  const [user, setUser] = useState({
+    name: 'محرم حسن',
+    nameEn: 'Maharram Hassan',
+    email: 'maharram@example.com',
+    level: 'المستوى الذهبي',
+    levelEn: 'Gold Level'
+  });
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
+  const handleLogin = (userData: any) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setActiveTab('dashboard');
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard user={user} />;
       case 'knowledge':
         return <KnowledgeBase />;
       case 'statistics':
         return <Statistics />;
       case 'calendar':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Calendar</h2>
-            <p className="text-gray-400">Schedule and track your learning sessions</p>
-          </div>
-        );
+        return <Calendar />;
       case 'achievements':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Achievements</h2>
-            <p className="text-gray-400">View your learning milestones and badges</p>
-          </div>
-        );
+        return <Achievements />;
       case 'goals':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Goals</h2>
-            <p className="text-gray-400">Set and track your learning objectives</p>
-          </div>
-        );
+        return <Goals />;
       case 'community':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Community</h2>
-            <p className="text-gray-400">Connect with fellow learners and teachers</p>
-          </div>
-        );
+        return <Community />;
       case 'settings':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Settings</h2>
-            <p className="text-gray-400">Customize your learning experience</p>
-          </div>
-        );
+        return <Settings user={user} setUser={setUser} />;
       default:
-        return <Dashboard />;
+        return <Dashboard user={user} />;
     }
   };
 
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+    <div className={`min-h-screen transition-all duration-300 ${darkMode ? 'bg-slate-50' : 'bg-gray-900'}`}>
       <div className="flex h-screen">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Sidebar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          darkMode={darkMode}
+        />
         
         <div className="flex-1 flex flex-col">
-          <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+          <Header 
+            darkMode={darkMode} 
+            toggleDarkMode={toggleDarkMode}
+            user={user}
+            onLogout={handleLogout}
+          />
           
           <div className="flex-1 flex">
             <main className="flex-1 p-6 overflow-y-auto">
               {renderContent()}
             </main>
             
-            <UserProfile />
+            <UserProfile user={user} darkMode={darkMode} />
           </div>
         </div>
       </div>
